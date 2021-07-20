@@ -1,32 +1,50 @@
-import axios from './utils/axios.js'
-import readline from 'readline-sync'
+import axios from "axios";
+import readline from "readline-sync";
 
-//utilizando biblioteca de input simples
-function Name(){
-    return readline.question('Digite o nome de um pokemon: ')
+function Nome() {
+  const Name = readline.question("Digite o nome de um pokemon: ");
+  return Name;
 }
 
-async function Pokemon(){
-    //realizando a pesquisa por nome e puxando da api
-    const pokemon = Name()
-    const Get_api = await axios.GET(pokemon)
+function Dados() {
+  const nome_pokemon = Nome();
+  axios.get(`https://pokeapi.co/api/v2/pokemon/${nome_pokemon}`).then((response) => {
+    const api = response.data;
 
-    //pegando todos os dados nescessarios da api e passando no console.log
-    const Experience = Get_api.data.base_experience
-    const Weight = Get_api.data.weight
-    const Height = Get_api.data.height
-    const Status = Get_api.data.stats[0].base_stat
-    const Species = Get_api.data.types[0].type.name
+    let experiencia = api.base_experience;
+    let peso = api.weight;
+    let status = api.stats[0].base_stat;
+    let altura = api.height;
+    let tipo = api.types[0].type.name;
 
-    //passando os dados em formato de string
-    console.log(`
-        Nome Pokemon: ${pokemon}
-        experiencia base: ${Experience} xp
-        peso: ${Weight} kg
-        altura: ${Height} cm
-        Status: ${Status}
-        especie: ${Species}
-    `)
+
+    const Species = axios.get(api.species.url).then((response) => {
+      const api = response.data;
+
+      let evolucao = ``;
+
+      if (api.evolves_from_species) {
+        evolucao = api.evolves_from_species.name;
+      } else {
+        evolucao = `Este pokemon não possui evolução, ou ainda não evoluiu`;
+      }
+
+      let pokemon = {
+        pokemon: nome_pokemon,
+        experiencia: experiencia,
+        peso: peso,
+        status: status,
+        tipo: tipo,
+        altura: altura,
+        evolucao: evolucao,
+        bebe: api.is_baby,
+        mitico: api.is_mythical,
+        lendario: api.is_legendary,
+      };
+
+      console.log(pokemon);
+    });
+  });
 }
 
-Pokemon()
+Dados();
