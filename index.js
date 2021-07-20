@@ -19,7 +19,7 @@ function Dados() {
       let altura = api.height;
       let tipo = api.types[0].type.name;
 
-      const species = axios.get(api.species.url).then((response) => {
+      const Species = axios.get(api.species.url).then((response) => {
         const api = response.data;
 
         let evolucao = ``;
